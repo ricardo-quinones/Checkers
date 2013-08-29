@@ -18,7 +18,7 @@ class Piece
 
     moves = []
     move1, move2 = [row + 1, col + 1], [row + 1, col - 1]
-    move3, move4 = [row - 1, col + 1], [row - 2, col - 1]
+    move3, move4 = [row - 1, col + 1], [row - 1, col - 1]
 
     red_moves, black_moves = [], []
 
@@ -34,7 +34,8 @@ class Piece
     elsif @color == :black
       moves = black_moves
     end
-
+    p "my moves are "
+    p moves
     moves
   end
 

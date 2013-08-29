@@ -112,7 +112,7 @@ class Board
       perform_jump(start_pos, end_pos)
       piece.to_king if piece.king_promotion?
     else
-      return "That's not a valid move"
+      raise "You did not select a valid move."
     end
   end
 
@@ -121,20 +121,16 @@ class Board
     end_row, end_col = end_pos[0], end_pos[1]
 
     if empty?(start_pos)
-      puts "The start position is empty."
-      return false
+      raise "The start position is empty."
+      # return false
     elsif @board[start_row][start_col].color != turn
-      puts "Move your piece."
-      return false
+      raise "Move your piece."
+      # return false
     elsif !@board[end_row][end_col].nil?
-      puts "You can't land on a piece"
-      return false
+      raise "You can't land on a piece."
+      # return false
     else
       true
     end
   end
 end
-
-# match = Board.new
-# match.set_board
-# match.render

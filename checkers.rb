@@ -3,48 +3,49 @@ require_relative 'board'
 class Checkers
 
   def initialize
-    @game = Board.new
+    @board = Board.new
     @turn = :black
+    @players = {black: HumanPlayer.new(:black, 1), red: HumanPlayer.new(:red, 2)}
   end
 
   def play
     puts "Welcome to Checkers!\n"
-    player1, player2 = HumanPlayer.new(:black, 1), HumanPlayer.new(:red, 2)
-    @game.set_board
+    @board.set_board
 
     loop do
-      @game.render
-
-      player_turn = (@turn == :black ? player1 : player2)
-
-      move = player_turn.gets_move(@turn)
-      move_piece(move)
-
-    end
-  end
-
-  def move_piece(move)
-    start_pos, end_pos = move[0], move[1]
-
-    if @game.legal_move?(@turn, start_pos, end_pos)
-      result = @game.perform_move(start_pos, end_pos)
-
-      @turn = (@turn == :black ? :red : :black) unless result.is_a?(String)
+      @board.render
+      @players[@turn].play_turn(@board)
+      @turn = (@turn == :black ? :red : :black)
     end
   end
 end
 
 class HumanPlayer
-  attr_reader :color, :player_num
+  attr_reader :player_num
 
   def initialize(color, player_num)
     @color = color
     @player_num = player_num
   end
 
-  def gets_move(turn)
-    puts "\nPlayer #{self.player_num}, it's your turn.\n".colorize(turn)
-    puts "Enter Start and End Position".colorize(turn)
+  def play_turn(board)
+    puts "\nPlayer #{self.player_num}, it's your turn.\n".colorize(@color)
+    begin
+      move = gets_move
+
+      start_pos, end_pos = move[0], move[1]
+
+      if board.legal_move?(@color, start_pos, end_pos)
+        board.perform_move(start_pos, end_pos)
+      end
+    rescue StandardError => e
+      puts e.message
+      retry
+    end
+  end
+
+  def gets_move
+    puts "Enter Start and End Position".colorize(@color)
 
     parse_position(gets.chomp.strip.downcase)
   end
