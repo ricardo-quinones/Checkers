@@ -1,7 +1,9 @@
 require_relative 'piece'
 
 class Board
+
   attr_accessor :board
+
   def initialize
     @board = make_board
   end
@@ -87,8 +89,6 @@ class Board
     start_row, start_col = start_pos[0], start_pos[1]
     end_row, end_col = end_pos[0], end_pos[1]
 
-    # return false unless @board[end_row][end_col].nil?
-
     piece = @board[start_row][start_col]
 
     mid_row = (start_row + end_row) / 2
@@ -97,7 +97,7 @@ class Board
     if @board[end_row][end_col].nil? && !@board[mid_row][mid_col].nil?
       return true unless @board[mid_row][mid_col].color == piece.color
     end
-    # p "please print me"
+
     false
   end
 
@@ -111,6 +111,7 @@ class Board
     elsif piece.jump_moves.include?(end_pos) && legal_jump?(start_pos, end_pos)
       perform_jump(start_pos, end_pos)
       piece.to_king if piece.king_promotion?
+      raise "Play again." if multiple_jumps?(piece)
     else
       raise "You did not select a valid move."
     end
@@ -122,15 +123,17 @@ class Board
 
     if empty?(start_pos)
       raise "The start position is empty."
-      # return false
     elsif @board[start_row][start_col].color != turn
       raise "Move your piece."
-      # return false
     elsif !@board[end_row][end_col].nil?
       raise "You can't land on a piece."
-      # return false
     else
       true
     end
+  end
+
+  def multiple_jumps?(piece)
+    start_pos = piece.pos
+    piece.jump_moves.any? { |end_pos| legal_jump?(start_pos, end_pos) }
   end
 end

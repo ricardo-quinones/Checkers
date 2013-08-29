@@ -34,8 +34,7 @@ class Piece
     elsif @color == :black
       moves = black_moves
     end
-    p "my moves are "
-    p moves
+
     moves
   end
 

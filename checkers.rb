@@ -13,10 +13,17 @@ class Checkers
     @board.set_board
 
     loop do
-      @board.render
       @players[@turn].play_turn(@board)
+      break if game_over?
       @turn = (@turn == :black ? :red : :black)
     end
+    @board.render
+    puts "\nCongratulations Player #{@players[@turn].player_num}. You won!"
+  end
+
+  def game_over?
+    pieces = @board.board.flatten.compact
+    pieces.none? { |piece| piece.color == :red } || pieces.none? { |piece| piece.color == :black }
   end
 end
 
@@ -31,6 +38,7 @@ class HumanPlayer
   def play_turn(board)
     puts "\nPlayer #{self.player_num}, it's your turn.\n".colorize(@color)
     begin
+      board.render
       move = gets_move
 
       start_pos, end_pos = move[0], move[1]
@@ -45,7 +53,7 @@ class HumanPlayer
   end
 
   def gets_move
-    puts "Enter Start and End Position".colorize(@color)
+    puts "\nEnter Start and End Position".colorize(@color)
 
     parse_position(gets.chomp.strip.downcase)
   end
