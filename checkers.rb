@@ -4,26 +4,32 @@ class Checkers
 
   def initialize
     @game = Board.new
-    @turn = :blue
+    @turn = :black
   end
 
   def play
     puts "Welcome to Checkers!\n"
-    player1, player2 = HumanPlayer.new(:blue, 1), HumanPlayer.new(:red, 2)
+    player1, player2 = HumanPlayer.new(:black, 1), HumanPlayer.new(:red, 2)
     @game.set_board
 
-    while true
+    loop do
       @game.render
 
-      player_turn = (@turn == :blue ? player1 : player2)
+      player_turn = (@turn == :black ? player1 : player2)
 
-      move = player_turn.gets_move
+      move = player_turn.gets_move(@turn)
+      move_piece(move)
 
-      start_pos, end_pos = move[0], move[1]
+    end
+  end
 
-      @game.perform_move(start_pos, end_pos)
+  def move_piece(move)
+    start_pos, end_pos = move[0], move[1]
 
-      @turn = (@turn == :blue ? :red : :blue)
+    if @game.legal_move?(@turn, start_pos, end_pos)
+      result = @game.perform_move(start_pos, end_pos)
+
+      @turn = (@turn == :black ? :red : :black) unless result.is_a?(String)
     end
   end
 end
@@ -36,15 +42,15 @@ class HumanPlayer
     @player_num = player_num
   end
 
-  def gets_move
-    puts "\nPlayer #{self.player_num}, it's your turn.\n".colorize(@turn)
-    puts "Enter Initial and End Position".colorize(@turn)
+  def gets_move(turn)
+    puts "\nPlayer #{self.player_num}, it's your turn.\n".colorize(turn)
+    puts "Enter Start and End Position".colorize(turn)
 
     parse_position(gets.chomp.strip.downcase)
   end
 
   def parse_position(str)
-    strings = [str[/\D\d/], str[/\D\d$/]]
+    strings = [str[/[a-h][1-8]/], str[/[a-h][1-8]$/]]
     move = []
     strings.each do |string|
       pair = []
