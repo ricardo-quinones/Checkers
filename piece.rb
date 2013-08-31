@@ -10,7 +10,7 @@ class Piece
     @color = color
     @pos = pos
     @king = false
-    @symbol = "●"
+    @symbol = "●".colorize(color)
   end
 
   def slide_moves
@@ -74,6 +74,6 @@ class Piece
 
   def to_king
     @king = true
-    @symbol = "○"
+    @symbol = "○".colorize(color)
   end
 end

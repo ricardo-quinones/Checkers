@@ -1,4 +1,5 @@
 require_relative 'piece'
+require 'colorize'
 
 class Board
 
@@ -34,8 +35,7 @@ class Board
     @board.each_with_index do |row, index|
       print "#{8 - index} "
       row.each do |piece|
-        color = piece.color unless piece.nil?
-       print (piece.nil? ? " _ " : " #{piece.symbol.colorize(color)} ")
+       print (piece.nil? ? "   ".colorize(:background => :green) : " #{piece.symbol.colorize(:backgroud => :white)} ")
       end
       print "\n"
     end
@@ -45,7 +45,6 @@ class Board
 
   def empty?(start_pos)
     row, col = start_pos[0], start_pos[1]
-    "I'm getting run"
     @board[row][col].nil?
   end
 
@@ -101,6 +100,11 @@ class Board
     false
   end
 
+  def legal_slide?(end_pos)
+    end_row, end_col = end_pos[0], end_pos[1]
+    @board[end_row][end_col].nil?
+  end
+
   def perform_move(start_pos, end_pos)
     start_row, start_col = start_pos[0], start_pos[1]
     piece = @board[start_row][start_col]
@@ -125,7 +129,7 @@ class Board
       raise "The start position is empty."
     elsif @board[start_row][start_col].color != turn
       raise "Move your piece."
-    elsif !@board[end_row][end_col].nil?
+    elsif !legal_slide?(end_pos)
       raise "You can't land on a piece."
     else
       true
@@ -135,5 +139,17 @@ class Board
   def multiple_jumps?(piece)
     start_pos = piece.pos
     piece.jump_moves.any? { |end_pos| legal_jump?(start_pos, end_pos) }
+  end
+
+  def any_player_moves?(turn)
+    player_pieces = @board.flatten.select { |piece| !piece.nil? && piece.color == turn }
+    player_pieces.each do |piece|
+      return true if piece.slide_moves.any? { |move| legal_slide?(move) }
+      return true if piece.jump_moves.any? { |move| legal_jump?(piece.pos, move) }
+    end
+  end
+
+  def any_moves?
+    any_player_moves?(:red) || any_player_moves(:black)
   end
 end
